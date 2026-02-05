@@ -16,9 +16,9 @@ import {
 	TrendingUp,
 	Users,
 } from "lucide-react";
-import { AdventureTimeline } from "./adventure-timeline";
 import { AdventureEvent } from "../types";
 import { motion } from "motion/react";
+import { AdventureCardGrid } from "./adventure-timeline";
 
 const adventureEvents: AdventureEvent[] = [
 	{
@@ -155,7 +155,7 @@ export default function AnnualPlanPage() {
 
 	return (
 		<div className="min-h-screen bg-background">
-			<div className="container mx-auto px-4 py-20 pt-28 max-w-6xl">
+			<div className="mx-auto px-4 py-20 pt-28 w-full md:max-w-[80vw]">
 				{/* Hero Section */}
 				<div className="text-center mb-16">
 					<div className="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-secondary/50 border border-border mb-6 animate-pulse">
@@ -234,7 +234,8 @@ export default function AnnualPlanPage() {
 						</div>
 					</CardHeader>
 					<CardContent className="p-4 md:p-6">
-						<AdventureTimeline
+						{/* Replace the placeholder with AdventureCardGrid */}
+						<AdventureCardGrid
 							items={adventureEvents}
 							title="2026 Adventure Calendar"
 							description="Explore our planned expeditions throughout the year"

@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono, Poppins } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/navbar";
 import { ThemeProvider } from "@/components/theme-provider";
 import Footer from "@/components/footer";
 
-const inter = Poppins({
+const inter = Inter({
 	subsets: ["latin"],
-	weight: ["500", "600", "700"],
+	weight: ["400", "500", "600", "700"],
 	variable: "--font-inter",
 });
 
@@ -30,7 +30,7 @@ export default function RootLayout({
 	return (
 		<html
 			lang="en"
-			className={`${inter.className} ${jetbrainsMono.className}`}
+			className={`${inter.variable} ${jetbrainsMono.variable}`}
 			suppressHydrationWarning
 		>
 			<body className="antialiased">

@@ -103,7 +103,7 @@ export default function ContactPage() {
 	return (
 		<div className="min-h-screen bg-background">
 			{/* Hero Section */}
-			<section className="relative overflow-hidden px-6 py-20 sm:px-8 md:py-28">
+			<section className="relative overflow-hidden px-6 py-28 sm:px-8 md:py-28">
 				<div className="pointer-events-none absolute inset-0 -z-10">
 					<div className="absolute left-1/2 top-1/4 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-primary/[0.035] blur-[140px]" />
 					<div className="absolute bottom-0 right-0 h-[360px] w-[360px] rounded-full bg-chart-2/[0.035] blur-[130px]" />

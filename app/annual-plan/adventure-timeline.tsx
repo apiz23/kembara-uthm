@@ -1,7 +1,7 @@
 "use client";
 
-import { motion, useInView } from "framer-motion";
-import { useRef, useState } from "react";
+import { motion } from "framer-motion";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
@@ -18,6 +18,8 @@ import {
 	ChevronRight,
 	Navigation,
 	ArrowRight,
+	Grid3x3,
+	Filter,
 } from "lucide-react";
 import { AdventureEvent } from "../types";
 import {
@@ -26,6 +28,8 @@ import {
 	MapMarker,
 	MarkerContent,
 } from "@/components/ui/map";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 /* ===================== HELPERS ===================== */
 export const getTypeIcon = (type: AdventureEvent["type"]) => {
@@ -71,36 +75,17 @@ export const getTypeBgColor = (type: AdventureEvent["type"]) => {
 
 export const getMonthColor = (month: string) => {
 	const monthColors: Record<string, string> = {
-		April: "bg-chart-4 text-white border-chart-4",
-		May: "bg-chart-2 text-white border-chart-2",
-		June: "bg-chart-3 text-white border-chart-3",
-		July: "bg-chart-1 text-white border-chart-1",
-		August: "bg-chart-5 text-white border-chart-5",
-		September: "bg-chart-4 text-white border-chart-4",
-		October: "bg-chart-2 text-white border-chart-2",
-		November: "bg-chart-3 text-white border-chart-3",
-		December: "bg-chart-1 text-white border-chart-1",
+		April: "bg-chart-4/90 text-white",
+		May: "bg-chart-2/90 text-white",
+		June: "bg-chart-3/90 text-white",
+		July: "bg-chart-1/90 text-white",
+		August: "bg-chart-5/90 text-white",
+		September: "bg-chart-4/90 text-white",
+		October: "bg-chart-2/90 text-white",
+		November: "bg-chart-3/90 text-white",
+		December: "bg-chart-1/90 text-white",
 	};
-	return (
-		monthColors[month] || "bg-primary text-primary-foreground border-primary"
-	);
-};
-
-export const getMonthBadgeColor = (month: string) => {
-	const monthColors: Record<string, string> = {
-		April: "bg-chart-4/90 text-white border-chart-4/90 shadow-md",
-		May: "bg-chart-2/90 text-white border-chart-2/90 shadow-md",
-		June: "bg-chart-3/90 text-white border-chart-3/90 shadow-md",
-		July: "bg-chart-1/90 text-white border-chart-1/90 shadow-md",
-		August: "bg-chart-5/90 text-white border-chart-5/90 shadow-md",
-		September: "bg-chart-4/90 text-white border-chart-4/90 shadow-md",
-		October: "bg-chart-2/90 text-white border-chart-2/90 shadow-md",
-		November: "bg-chart-3/90 text-white border-chart-3/90 shadow-md",
-		December: "bg-chart-1/90 text-white border-chart-1/90 shadow-md",
-	};
-	return (
-		monthColors[month] || "bg-primary/90 text-white border-primary/90 shadow-md"
-	);
+	return monthColors[month] || "bg-primary/90 text-white";
 };
 
 /* ===================== DETAIL VIEW ===================== */
@@ -135,9 +120,7 @@ export function EventDetailView({ event }: { event: AdventureEvent }) {
 							<h2 className="text-xl font-bold text-foreground">{event.title}</h2>
 							<p className="text-sm text-muted-foreground">{event.location}</p>
 						</div>
-						<div
-							className={`px-3 py-1.5 rounded-full ${getMonthBadgeColor(event.month)}`}
-						>
+						<div className={`px-3 py-1.5 rounded-full ${getMonthColor(event.month)}`}>
 							<span className="text-sm font-semibold">{event.month} 2026</span>
 						</div>
 					</div>
@@ -255,7 +238,7 @@ function EventMiniMap({ event }: { event: AdventureEvent }) {
 
 	return (
 		<div
-			className="relative h-[20vh] w-full rounded-lg overflow-hidden border border-border/50 bg-card/50 shadow-xs"
+			className="relative h-[180px] w-full rounded-lg overflow-hidden border border-border/50 bg-card/50 shadow-xs group"
 			onMouseEnter={() => setIsHovered(true)}
 			onMouseLeave={() => setIsHovered(false)}
 		>
@@ -280,14 +263,14 @@ function EventMiniMap({ event }: { event: AdventureEvent }) {
 				</MapMarker>
 			</Map>
 
+			{/* Gradient overlay */}
+			<div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
 			{/* Location label */}
-			<div className="absolute bottom-2 right-2 flex flex-col items-end">
+			<div className="absolute bottom-2 right-2 flex flex-col items-end my-5">
 				<div className="bg-background/90 backdrop-blur-sm rounded px-2 py-1 shadow-xs">
-					<p className="text-xs font-medium text-foreground truncate">
+					<p className="text-xs font-medium text-foreground truncate max-w-[120px]">
 						{event.location}
-					</p>
-					<p className="text-[10px] text-muted-foreground truncate">
-						{event.coordinates.lat.toFixed(2)}°N, {event.coordinates.lng.toFixed(2)}°E
 					</p>
 				</div>
 			</div>
@@ -300,235 +283,286 @@ function EventMiniMap({ event }: { event: AdventureEvent }) {
 	);
 }
 
-/* ===================== TIMELINE ITEM COMPONENT ===================== */
-function TimelineItemComponent({
-	item,
-	index,
-}: {
-	item: AdventureEvent;
-	index: number;
-}) {
-	const itemRef = useRef(null);
-	const itemInView = useInView(itemRef, {
-		once: true,
-		margin: "-50px",
-	});
-
-	const TypeIcon = getTypeIcon(item.type);
+/* ===================== EVENT CARD COMPONENT ===================== */
+function EventCard({ event, index }: { event: AdventureEvent; index: number }) {
+	const TypeIcon = getTypeIcon(event.type);
 	const [isSheetOpen, setIsSheetOpen] = useState(false);
 
 	return (
-		<div ref={itemRef} className="relative flex gap-6 group">
-			{/* Timeline dot */}
-			<motion.div
-				initial={{ scale: 0 }}
-				animate={itemInView ? { scale: 1 } : { scale: 0 }}
-				transition={{ delay: index * 0.1, duration: 0.2 }}
-				className="absolute left-5 top-8 h-4 w-4 rounded-full border-2 border-background bg-card shadow-sm flex items-center justify-center z-10"
-			>
-				<div
-					className={`h-2.5 w-2.5 rounded-full ${getTypeColor(item.type).split(" ")[0]}`}
-				/>
-			</motion.div>
-
-			{/* Content */}
-			<motion.div
-				initial={{ opacity: 0, x: -20 }}
-				animate={itemInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
-				transition={{ delay: index * 0.1 + 0.1, duration: 0.3 }}
-				className="ml-10 flex-1"
-			>
-				<Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-					<SheetTrigger asChild>
-						<div className="cursor-pointer rounded-xl border border-border bg-card p-5 hover:border-primary/50 hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 group shadow-sm">
-							{/* Month Badge */}
-							<div className="absolute -top-3 right-5 z-10">
+		<motion.div
+			initial={{ opacity: 0, y: 20 }}
+			animate={{ opacity: 1, y: 0 }}
+			transition={{ duration: 0.4, delay: index * 0.05 }}
+			whileHover={{ y: -4, transition: { duration: 0.2 } }}
+			className="h-full"
+		>
+			<Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+				<SheetTrigger asChild>
+					<div className="cursor-pointer h-full rounded-2xl border border-border/40 bg-card overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:border-primary/30 group">
+						{/* Top section with month and type */}
+						<div className="relative p-5">
+							{/* Month badge */}
+							<div className="absolute top-4 right-4">
 								<div
-									className={`px-4 py-1.5 rounded-full ${getMonthBadgeColor(item.month)} font-medium`}
+									className={`px-3 py-1 rounded-full ${getMonthColor(event.month)} text-xs font-semibold`}
 								>
-									<span className="text-xs font-semibold tracking-wide">
-										{item.month}
-									</span>
+									{event.month}
 								</div>
 							</div>
 
-							{/* Header with type badge */}
+							{/* Type icon and badge */}
 							<div className="flex items-center gap-3 mb-4">
 								<div
-									className={`p-2.5 rounded-lg ${getTypeBgColor(item.type)} ${getTypeOutlineColor(item.type)}/30 border`}
+									className={`p-2.5 rounded-xl ${getTypeBgColor(event.type)} ${getTypeOutlineColor(event.type)}/30 border`}
 								>
-									<TypeIcon className="h-4.5 w-4.5" />
+									<TypeIcon className="h-5 w-5" />
 								</div>
 								<div className="flex items-center gap-2">
 									<Badge
-										className={`${getTypeColor(item.type)} font-medium text-xs px-3 py-1`}
+										className={`${getTypeColor(event.type)} font-medium text-xs px-3 py-1`}
 									>
-										<TypeIcon className="h-3 w-3 mr-1.5" />
-										{item.type.toUpperCase()}
+										{event.type.toUpperCase()}
 									</Badge>
-									{item.confirmed ? (
-										<Badge className="bg-green-500/20 text-green-600 border-green-500/40 font-medium text-xs px-3 py-1">
-											<CheckCircle2 className="h-3 w-3 mr-1.5" />
+									{event.confirmed ? (
+										<Badge className="bg-green-500/20 text-green-600 border-green-500/40 font-medium text-xs px-2 py-1">
+											<CheckCircle2 className="h-3 w-3 mr-1" />
 											Confirmed
 										</Badge>
 									) : (
-										<Badge className="bg-amber-500/20 text-amber-600 border-amber-500/40 font-medium text-xs px-3 py-1">
-											<AlertCircle className="h-3 w-3 mr-1.5" />
+										<Badge className="bg-amber-500/20 text-amber-600 border-amber-500/40 font-medium text-xs px-2 py-1">
+											<AlertCircle className="h-3 w-3 mr-1" />
 											Tentative
 										</Badge>
 									)}
 								</div>
 							</div>
 
-							{/* Title & Description */}
-							<h3 className="text-xl font-bold text-foreground mb-3 pr-16">
-								{item.title}
+							{/* Title */}
+							<h3 className="text-xl font-bold text-foreground mb-3 pr-12 line-clamp-1">
+								{event.title}
 							</h3>
-							{item.description && (
+
+							{/* Description */}
+							{event.description && (
 								<p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-									{item.description}
+									{event.description}
 								</p>
 							)}
+						</div>
 
-							{/* Mini Map */}
-							<div className="mb-4">
-								<EventMiniMap event={item} />
-							</div>
+						{/* Mini Map */}
+						<div className="px-5">
+							<EventMiniMap event={event} />
+						</div>
 
-							{/* Date & Duration Info */}
+						{/* Bottom info section */}
+						<div className="p-5">
 							<div className="flex items-center justify-between mb-4">
-								<div className="flex items-center gap-4">
-									<div className="flex items-center gap-2 text-sm bg-secondary/50 px-3 py-1.5 rounded-lg">
+								<div className="flex items-center gap-3">
+									<div className="flex items-center gap-2 text-sm">
 										<Calendar className="h-4 w-4 text-chart-2" />
-										<span className="font-semibold text-foreground">{item.dates}</span>
+										<span className="font-medium text-foreground">{event.dates}</span>
 									</div>
-									{item.duration && (
-										<div className="flex items-center gap-2 text-sm bg-secondary/50 px-3 py-1.5 rounded-lg">
+									{event.duration && (
+										<div className="flex items-center gap-2 text-sm">
 											<Clock className="h-4 w-4 text-chart-3" />
-											<span className="font-semibold text-foreground">
-												{item.duration}
-											</span>
+											<span className="font-medium text-foreground">{event.duration}</span>
 										</div>
 									)}
 								</div>
 							</div>
 
-							{/* Details & CTA */}
-							<div className="flex items-center justify-between pt-4 border-t border-border/50">
-								<div className="flex items-center gap-2 text-sm bg-secondary/30 px-3 py-1.5 rounded-lg">
+							<div className="flex items-center justify-between">
+								<div className="flex items-center gap-2 text-sm">
 									<MapPin className="h-4 w-4 text-primary" />
-									<span className="font-medium text-foreground">{item.location}</span>
+									<span className="font-medium text-foreground truncate max-w-[120px]">
+										{event.location}
+									</span>
 								</div>
 
-								{/* View Details */}
+								{/* CTA */}
 								<div className="flex items-center gap-2 text-sm font-semibold text-primary group-hover:gap-3 transition-all">
-									<span>Explore Adventure</span>
-									<ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+									<span className="text-xs">View Details</span>
+									<ArrowRight className="h-3 w-3 group-hover:translate-x-1 transition-transform" />
 								</div>
 							</div>
 						</div>
-					</SheetTrigger>
-					<SheetContent className="p-0 w-full sm:max-w-2xl">
-						<EventDetailView event={item} />
-					</SheetContent>
-				</Sheet>
-			</motion.div>
-		</div>
+					</div>
+				</SheetTrigger>
+				<SheetContent className="p-0 w-full sm:max-w-2xl">
+					<EventDetailView event={event} />
+				</SheetContent>
+			</Sheet>
+		</motion.div>
 	);
 }
 
-/* ===================== MAIN TIMELINE COMPONENT ===================== */
-type AdventureTimelineProps = {
+/* ===================== MAIN CARD GRID COMPONENT ===================== */
+type AdventureCardGridProps = {
 	items?: AdventureEvent[];
 	title?: string;
 	description?: string;
 };
 
-function AdventureTimeline({
+export function AdventureCardGrid({
 	items = [],
-	title = "Adventure Timeline",
+	title = "Upcoming Adventures",
 	description = "Explore our upcoming expeditions and adventures",
-}: AdventureTimelineProps) {
-	const ref = useRef(null);
-	const isInView = useInView(ref, { once: true, margin: "-30px" });
+}: AdventureCardGridProps) {
+	const [searchQuery, setSearchQuery] = useState("");
+	const [selectedType, setSelectedType] = useState<string>("All");
+	const [selectedMonth, setSelectedMonth] = useState<string>("All");
 
-	// Group items by month
-	const groupedByMonth = items.reduce(
-		(acc, item) => {
-			if (!acc[item.month]) {
-				acc[item.month] = [];
-			}
-			acc[item.month].push(item);
-			return acc;
-		},
-		{} as Record<string, AdventureEvent[]>,
-	);
+	// Get unique types and months
+	const allTypes = ["All", ...new Set(items.map((item) => item.type))];
+	const allMonths = ["All", ...new Set(items.map((item) => item.month))];
 
-	// Sort months chronologically
-	const monthOrder = [
-		"April",
-		"May",
-		"June",
-		"July",
-		"August",
-		"September",
-		"October",
-		"November",
-		"December",
-	];
-	const sortedMonths = Object.keys(groupedByMonth).sort(
-		(a, b) => monthOrder.indexOf(a) - monthOrder.indexOf(b),
-	);
+	// Filter items
+	const filteredItems = items.filter((item) => {
+		const matchesSearch =
+			searchQuery === "" ||
+			item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+			item.location.toLowerCase().includes(searchQuery.toLowerCase());
+
+		const matchesType =
+			selectedType === "All" || item.type === selectedType.toLowerCase();
+		const matchesMonth = selectedMonth === "All" || item.month === selectedMonth;
+
+		return matchesSearch && matchesType && matchesMonth;
+	});
 
 	return (
 		<div className="w-full mx-auto">
 			{/* Header */}
 			<div className="text-center mb-12">
-				<h2 className="text-2xl md:text-3xl font-bold mb-3 tracking-tight text-foreground">
+				<div className="inline-flex items-center gap-2 rounded-full border border-border/50 bg-background/60 px-4 py-1.5 text-xs uppercase tracking-[0.2em] text-foreground/70 backdrop-blur mb-4">
+					<Grid3x3 className="h-3 w-3" />
+					Adventure Catalog
+				</div>
+				<h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
 					{title}
 				</h2>
-				<p className="text-muted-foreground max-w-2xl mx-auto">{description}</p>
+				<p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+					{description}
+				</p>
 			</div>
 
-			<div ref={ref} className="relative w-full">
-				{/* Timeline line */}
-				<motion.div
-					initial={{ scaleY: 0 }}
-					animate={isInView ? { scaleY: 1 } : { scaleY: 0 }}
-					transition={{ duration: 0.5, ease: "easeOut" }}
-					className="absolute left-5 top-0 h-full w-px origin-top bg-gradient-to-b from-primary/50 via-primary/30 to-transparent"
-				/>
+			{/* Filters */}
+			<div className="mb-8 space-y-6">
+				{/* Search */}
+				<div className="max-w-md mx-auto">
+					<div className="relative">
+						<Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+						<Input
+							type="search"
+							placeholder="Search adventures..."
+							className="pl-10 pr-4 py-2 rounded-full border-border/50 bg-background/60 backdrop-blur"
+							value={searchQuery}
+							onChange={(e) => setSearchQuery(e.target.value)}
+						/>
+					</div>
+				</div>
 
-				<div className="space-y-8">
-					{sortedMonths.map((month, monthIndex) => (
-						<div key={month} className="space-y-8">
-							{/* Month Header */}
-							<motion.div
-								initial={{ opacity: 0, y: -10 }}
-								animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: -10 }}
-								transition={{ delay: monthIndex * 0.1, duration: 0.3 }}
-								className="relative"
+				{/* Filter buttons */}
+				<div className="flex flex-col md:flex-row gap-4 justify-center">
+					<div className="flex flex-wrap gap-2 justify-center">
+						<span className="text-sm font-medium text-muted-foreground self-center">
+							Type:
+						</span>
+						{allTypes.map((type) => (
+							<Button
+								key={type}
+								variant={selectedType === type ? "default" : "outline"}
+								size="sm"
+								className="rounded-full"
+								onClick={() => setSelectedType(type)}
 							>
-								<div className="flex items-center gap-4">
-									<div className="flex-1 h-px bg-gradient-to-r from-transparent to-border" />
-									<div
-										className={`px-4 py-2.5 rounded-full ${getMonthBadgeColor(month)} text-sm font-semibold`}
-									>
-										{month} 2026 • {groupedByMonth[month].length} Adventure
-										{groupedByMonth[month].length !== 1 ? "s" : ""}
-									</div>
-									<div className="flex-1 h-px bg-gradient-to-l from-transparent to-border" />
-								</div>
-							</motion.div>
+								{type === "All" ? "All Types" : type}
+							</Button>
+						))}
+					</div>
 
-							{/* Events for this month */}
-							{groupedByMonth[month].map((event, eventIndex) => (
-								<TimelineItemComponent
-									key={event.id}
-									item={event}
-									index={monthIndex * 10 + eventIndex}
-								/>
-							))}
+					<div className="flex flex-wrap gap-2 justify-center">
+						<span className="text-sm font-medium text-muted-foreground self-center">
+							Month:
+						</span>
+						{allMonths.map((month) => (
+							<Button
+								key={month}
+								variant={selectedMonth === month ? "default" : "outline"}
+								size="sm"
+								className="rounded-full"
+								onClick={() => setSelectedMonth(month)}
+							>
+								{month === "All" ? "All Months" : month}
+							</Button>
+						))}
+					</div>
+				</div>
+			</div>
+
+			{/* Results count */}
+			<div className="mb-6 text-center">
+				<p className="text-sm text-muted-foreground">
+					Showing {filteredItems.length} of {items.length} adventures
+				</p>
+			</div>
+
+			{/* Card Grid */}
+			{filteredItems.length > 0 ? (
+				<motion.div
+					layout
+					className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+				>
+					{filteredItems.map((event, index) => (
+						<EventCard key={event.id} event={event} index={index} />
+					))}
+				</motion.div>
+			) : (
+				<div className="text-center py-12">
+					<div className="inline-flex items-center gap-3 rounded-2xl border border-border/50 bg-background/60 px-8 py-4 mb-6">
+						<AlertCircle className="h-5 w-5 text-amber-500" />
+						<span className="font-medium">No adventures found</span>
+					</div>
+					<p className="text-muted-foreground mb-6">
+						Try adjusting your search or filter criteria
+					</p>
+					<Button
+						variant="outline"
+						onClick={() => {
+							setSearchQuery("");
+							setSelectedType("All");
+							setSelectedMonth("All");
+						}}
+					>
+						Clear All Filters
+					</Button>
+				</div>
+			)}
+
+			{/* Stats footer */}
+			<div className="mt-12 pt-8 border-t border-border/40">
+				<div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+					{[
+						{ label: "Total Adventures", value: items.length.toString() },
+						{
+							label: "Confirmed",
+							value: items.filter((i) => i.confirmed).length.toString(),
+						},
+						{
+							label: "Unique Locations",
+							value: new Set(items.map((i) => i.location)).size.toString(),
+						},
+						{
+							label: "Months Covered",
+							value: new Set(items.map((i) => i.month)).size.toString(),
+						},
+					].map((stat, index) => (
+						<div key={index} className="text-center">
+							<div className="text-2xl font-bold text-foreground mb-1">
+								{stat.value}
+							</div>
+							<div className="text-sm text-muted-foreground">{stat.label}</div>
 						</div>
 					))}
 				</div>
@@ -536,5 +570,3 @@ function AdventureTimeline({
 		</div>
 	);
 }
-
-export { AdventureTimeline };
