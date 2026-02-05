@@ -56,7 +56,7 @@ export default function HomePage() {
 	return (
 		<div className="min-h-screen bg-background text-foreground overflow-hidden">
 			{/* Hero Section - Introduction */}
-			<section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-linear-to-b from-background via-background/95 to-card">
+			<section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-b from-background via-background/95 to-card">
 				{/* Animated background with theme colors */}
 				<div className="pointer-events-none absolute inset-0 -z-10">
 					<div className="absolute left-1/2 top-1/4 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-primary/5 dark:bg-primary/[0.035] blur-[140px]" />
@@ -64,8 +64,8 @@ export default function HomePage() {
 					<div className="absolute left-1/4 top-1/2 h-[400px] w-[400px] rounded-full bg-foreground/5 dark:bg-foreground/[0.02] blur-[150px]" />
 				</div>
 
-				{/* Grid background */}
-				<div className="absolute inset-0 bg-[linear-linear(to_right,var(--border)/10_1px,transparent_1px),linear-linear(to_bottom,var(--border)/10_1px,transparent_1px)] bg-[size:24px_24px]" />
+				{/* Grid background - FIXED: Correct gradient syntax */}
+				<div className="absolute inset-0 bg-[linear-gradient(to_right,var(--border)/10_1px,transparent_1px),linear-gradient(to_bottom,var(--border)/10_1px,transparent_1px)] bg-[size:24px_24px]" />
 
 				<div className="container mx-auto px-4 py-32 md:py-12 relative z-10">
 					<div className="max-w-6xl mx-auto">
@@ -80,33 +80,60 @@ export default function HomePage() {
 								<div className="flex flex-col items-center justify-center mb-6">
 									<motion.div
 										variants={scaleIn}
-										className="inline-flex items-center justify-center w-24 h-24 rounded-2xl bg-linear-to-br from-primary to-primary/80 shadow-xl mb-8"
+										className="relative inline-flex items-center justify-center w-28 h-28 mb-8"
 										whileHover={{ scale: 1.05 }}
-										transition={{ type: "spring", stiffness: 200 }}
+										transition={{ type: "spring", stiffness: 300 }}
 									>
-										<Image
-											src={logo}
-											alt="Kembara UTHM Logo"
-											width={72}
-											height={72}
-											className="drop-shadow-lg"
-										/>
+										{/* Animated glow effect */}
+										<div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary via-primary/80 to-chart-2 animate-pulse blur-xl opacity-50" />
+
+										{/* Gradient border */}
+										<div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary via-primary/80 to-chart-2 p-[2px]">
+											<div className="absolute inset-0 rounded-2xl bg-background blur-sm" />
+										</div>
+
+										{/* Main logo container */}
+										<div className="relative z-10 w-full h-full rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-chart-2/5 backdrop-blur-sm border border-primary/20 flex items-center justify-center shadow-2xl">
+											<Image
+												src={logo}
+												alt="Kembara UTHM Logo"
+												width={80}
+												height={80}
+												className="drop-shadow-2xl brightness-125 contrast-110"
+											/>
+										</div>
 									</motion.div>
 
 									<Badge
-										variant="secondary"
-										className="inline-flex items-center gap-2 rounded-full border-border/40 bg-card px-4 py-1.5 text-xs uppercase tracking-[0.2em] text-foreground/80 mb-6"
+										variant="outline"
+										className="inline-flex items-center gap-3 rounded-full border-primary/30 bg-card/80 backdrop-blur-sm px-6 py-2.5 text-sm font-semibold uppercase tracking-widest mb-6 group hover:border-primary/60 hover:bg-card transition-all duration-300"
 									>
-										<Sparkles className="h-3 w-3 text-primary" />
-										UTHM Adventure Club
-										<div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+										{/* Animated sparkle */}
+										<div className="relative">
+											<Sparkles className="h-4 w-4 text-primary animate-spin-slow" />
+											<div className="absolute inset-0 bg-primary/20 blur-sm animate-ping" />
+										</div>
+
+										{/* Text with gradient */}
+										<span className="bg-gradient-to-r from-primary via-primary/90 to-chart-2 bg-clip-text text-transparent font-bold">
+											UTHM Adventure Club
+										</span>
+
+										{/* Separator */}
+										<div className="h-4 w-px bg-gradient-to-b from-transparent via-primary/50 to-transparent" />
+
+										{/* Animated dot */}
+										<div className="relative">
+											<div className="h-2 w-2 rounded-full bg-primary" />
+											<div className="absolute inset-0 rounded-full bg-primary animate-ping" />
+										</div>
 									</Badge>
 								</div>
 								<motion.h1
 									variants={fadeInUp}
 									className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 tracking-tight leading-tight"
 								>
-									<span className="block bg-linear-to-r from-primary via-primary/80 to-chart-3 bg-clip-text text-transparent">
+									<span className="block bg-gradient-to-r from-primary via-primary/80 to-chart-3 bg-clip-text text-transparent">
 										Kembara
 									</span>
 									<span className="block text-foreground mt-2">UTHM Adventure Club</span>
@@ -163,9 +190,10 @@ export default function HomePage() {
 												src={image.src}
 												alt={image.alt}
 												fill
+												sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
 												className="object-cover group-hover:scale-110 transition-transform duration-700"
 											/>
-											<div className="absolute inset-0 bg-linear-to-t from-background/90 via-background/20 to-transparent" />
+											<div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
 											<div className="absolute bottom-4 left-4">
 												<Badge className="bg-card/90 backdrop-blur-sm border-border/40 text-black dark:text-white">
 													<Icon className="h-3 w-3 mr-1" />
@@ -221,7 +249,7 @@ export default function HomePage() {
 												>
 													<Icon className={`h-6 w-6 ${stat.color.split(" ")[1]}`} />
 												</div>
-												<div className="text-3xl font-bold bg-linear-to-r from-primary to-chart-3 bg-clip-text text-transparent">
+												<div className="text-3xl font-bold bg-gradient-to-r from-primary to-chart-3 bg-clip-text text-transparent">
 													{stat.value}
 												</div>
 												<div className="text-sm text-muted-foreground font-medium">
@@ -252,7 +280,8 @@ export default function HomePage() {
 
 			{/* Club Story */}
 			<section className="py-20 bg-card/50 relative overflow-hidden">
-				<div className="absolute inset-0 bg-[linear-linear(to_right,var(--border)/5_1px,transparent_1px),linear-linear(to_bottom,var(--border)/5_1px,transparent_1px)] bg-[size:24px_24px]" />
+				{/* Grid background - FIXED */}
+				<div className="absolute inset-0 bg-[linear-gradient(to_right,var(--border)/5_1px,transparent_1px),linear-gradient(to_bottom,var(--border)/5_1px,transparent_1px)] bg-[size:24px_24px]" />
 
 				<div className="container mx-auto px-4 relative z-10">
 					<div className="max-w-6xl mx-auto">
@@ -278,7 +307,6 @@ export default function HomePage() {
 								power of nature
 							</p>
 						</motion.div>
-
 						<div className="grid md:grid-cols-2 gap-12 items-center">
 							<div className="space-y-8">
 								<motion.div
@@ -321,13 +349,13 @@ export default function HomePage() {
 									whileInView={{ opacity: 1, y: 0 }}
 									viewport={{ once: true }}
 									transition={{ duration: 0.6, delay: 0.2 }}
-									className="flex items-center gap-4"
+									className="flex flex-col sm:flex-row gap-4"
 								>
-									<Button size="lg" className="gap-2">
+									<Button size="lg" className="gap-2 w-full sm:w-auto">
 										Join Our Community
 										<ArrowUpRight className="h-4 w-4" />
 									</Button>
-									<Button size="lg" variant="outline" className="gap-2">
+									<Button size="lg" variant="outline" className="gap-2 w-full sm:w-auto">
 										<PlayCircle className="h-4 w-4" />
 										Watch Our Story
 									</Button>
@@ -341,26 +369,30 @@ export default function HomePage() {
 								transition={{ duration: 0.6 }}
 								className="relative"
 							>
-								<div className="relative h-96 rounded-2xl overflow-hidden shadow-xl border border-border/40 group">
+								<div className="relative h-64 sm:h-80 md:h-96 rounded-2xl overflow-hidden shadow-xl border border-border/40 group">
 									<Image
 										src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"
 										alt="Kembara Community"
 										fill
+										sizes="(max-width: 768px) 100vw, 50vw"
 										className="object-cover group-hover:scale-105 transition-transform duration-700"
 									/>
-									<div className="absolute inset-0 bg-linear-to-t from-foreground/20 via-transparent to-transparent" />
+									<div className="absolute inset-0 bg-gradient-to-t from-foreground/20 via-transparent to-transparent" />
 								</div>
+
+								{/* Floating image - responsive positioning */}
 								<motion.div
 									initial={{ opacity: 0, scale: 0.8 }}
 									whileInView={{ opacity: 1, scale: 1 }}
 									viewport={{ once: true }}
 									transition={{ duration: 0.6, delay: 0.3 }}
-									className="absolute -bottom-4 -right-4 w-32 h-32 rounded-2xl overflow-hidden border-4 border-background shadow-lg"
+									className="absolute -right-2 sm:right-0 md:-right-4 bottom-0 md:-bottom-4 w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-2xl overflow-hidden border-4 border-background shadow-lg"
 								>
 									<Image
 										src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
 										alt="Adventure Moment"
 										fill
+										sizes="(max-width: 640px) 96px, (max-width: 768px) 112px, 128px"
 										className="object-cover"
 									/>
 								</motion.div>
@@ -371,7 +403,7 @@ export default function HomePage() {
 			</section>
 
 			{/* Adventure Types - Bento Grid Style */}
-			<section className="py-20 relative bg-linear-to-b from-background via-background to-background/95">
+			<section className="py-20 relative bg-gradient-to-b from-background via-background to-background/95">
 				<div className="absolute inset-0 -z-10">
 					<div className="absolute right-1/4 top-1/4 h-[400px] w-[400px] rounded-full bg-chart-4/5 dark:bg-chart-4/[0.02] blur-[120px]" />
 				</div>
@@ -450,9 +482,10 @@ export default function HomePage() {
 												src={type.image}
 												alt={type.title}
 												fill
+												sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
 												className="object-cover group-hover:scale-105 transition-transform duration-500"
 											/>
-											<div className="absolute inset-0 bg-linear-to-t from-background/60 via-background/20 to-transparent" />
+											<div className="absolute inset-0 bg-gradient-to-t from-background/60 via-background/20 to-transparent" />
 											<div className="absolute top-4 left-4">
 												<div className="w-12 h-12 rounded-full bg-card/90 backdrop-blur-sm flex items-center justify-center border border-border/40">
 													<Icon className="h-6 w-6 text-foreground" />
@@ -575,7 +608,7 @@ export default function HomePage() {
 			</section>
 
 			{/* Photo Gallery Preview */}
-			<section className="py-20 relative bg-linear-to-b from-background to-card">
+			<section className="py-20 relative bg-gradient-to-b from-background to-card">
 				<div className="absolute inset-0 -z-10">
 					<div className="absolute left-1/4 bottom-1/4 h-[300px] w-[300px] rounded-full bg-chart-3/5 dark:bg-chart-3/[0.02] blur-[100px]" />
 				</div>
@@ -619,9 +652,10 @@ export default function HomePage() {
 									src={src}
 									alt={`Adventure photo ${index + 1}`}
 									fill
+									sizes="(max-width: 768px) 50vw, 25vw"
 									className="object-cover group-hover:scale-110 transition-transform duration-700"
 								/>
-								<div className="absolute inset-0 bg-linear-to-t from-background/40 via-background/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+								<div className="absolute inset-0 bg-gradient-to-t from-background/40 via-background/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 							</motion.div>
 						))}
 					</div>
@@ -653,8 +687,9 @@ export default function HomePage() {
 			</section>
 
 			{/* Footer CTA */}
-			<section className="py-16 bg-linear-to-b from-background via-card/50 to-card relative overflow-hidden">
-				<div className="absolute inset-0 bg-[linear-linear(to_right,var(--border)/5_1px,transparent_1px),linear-linear(to_bottom,var(--border)/5_1px,transparent_1px)] bg-[size:24px_24px]" />
+			<section className="py-16 bg-gradient-to-b from-background via-card/50 to-card relative overflow-hidden">
+				{/* Grid background - FIXED */}
+				<div className="absolute inset-0 bg-[linear-gradient(to_right,var(--border)/5_1px,transparent_1px),linear-gradient(to_bottom,var(--border)/5_1px,transparent_1px)] bg-[size:24px_24px]" />
 
 				<div className="container mx-auto px-4 text-center relative z-10">
 					<motion.div
